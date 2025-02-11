@@ -11,7 +11,7 @@ Electrónica II para Ingeniería Electrónica. 2024
   - Utilizar para IO las direcciones 0x80000000 a 0xFFFFFFFF
   - Cada pin de entrada o salida se representa por un registro de 32 bit con alineación de palabra (el bus del proyecto 10 no permite acceso a byte ni media palabra). Un valor de 1 corresponderá al estado ALTO y un 0 al estado BAJO del pin.
   - En los pines de entrada se utilizará un sincronizador de dos flip-flop.
-- Realizar la síntesis lógica y configurar una placa EDU-CIAA-FPGA con el microcontrolador desarrollado.
+- Realizar la síntesis lógica y configurar una placa EDU-CIAA-FPGA con el microcontrolador desarrollado. Para ello deberás instalar OSS CAD Suite de YosysHQ
 
 ## Entregables
 
