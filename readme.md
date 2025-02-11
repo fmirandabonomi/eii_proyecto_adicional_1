@@ -9,6 +9,8 @@ Electrónica II para Ingeniería Electrónica. 2024
 - Integrar en un microcontrolador el núcleo desarrollado en el proyecto 10 con un bus incluyendo además de la memoria de programa y datos, cuatro puertos de entrada y cuatro puertos de salida.
   - Utilizar para memoria las direcciones 0x00000000 a 0x7FFFFFFF
   - Utilizar para IO las direcciones 0x80000000 a 0xFFFFFFFF
+  - Cada pin de entrada o salida se representa por un registro de 32 bit con alineación de palabra (el bus del proyecto 10 no permite acceso a byte ni media palabra). Un valor de 1 corresponderá al estado ALTO y un 0 al estado BAJO del pin.
+  - En los pines de entrada se utilizará un sincronizador de dos flip-flop.
 - Realizar la síntesis lógica y configurar una placa EDU-CIAA-FPGA con el microcontrolador desarrollado.
 
 ## Entregables
