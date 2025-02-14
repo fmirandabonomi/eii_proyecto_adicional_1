@@ -28,3 +28,91 @@ Un informe con la siguiente estructura:
 - *Resultados* Explicar los cambios realizados sobre el proyecto 10, el diseño del bus de computadora y el microcontrolador. Presentar los resultados de simulación y pruebas sobre hardware.
 - *Conclusiones* Concluir, en base a los resultados obtenidos, sobre el cumplimiento de los objetivos.
 - *Referencias*
+
+## Programas de prueba:
+
+### Parpadeo con retardo (para ejecutar en placa)
+
+Código C
+
+~~~C
+#include <stdint.h>
+int main(void)
+{
+    volatile uint32_t *const o0 = (void*)0x80000010;
+    for(;;)
+    {
+        *o0 = ! *o0;
+        for(int i=0;i<(12000000-8)/9;++i) ;
+    }
+}
+~~~
+
+Listado ensamblador
+
+~~~asm
+00000000 <main>:
+    0:         80000737        lui x14 0x80000
+    4:         001466b7        lui x13 0x146
+00000008 <L3>:
+    8:         01072783        lw x15 16 x14
+    c:         0017b793        sltiu x15 x15 1
+    10:        00f72823        sw x15 16 x14
+    14:        85468793        addi x15 x13 -1964
+00000018 <L2>:
+    18:        fff78793        addi x15 x15 -1
+    1c:        fe079ee3        bne x15 x0 -4 <L2>
+    20:        fe9ff06f        jal x0 -24 <L3>
+~~~
+
+Archivo parpadeo_con_retardo.mem:
+
+~~~hex
+80000737
+001466b7
+01072783
+0017b793
+00f72823
+85468793
+fff78793
+fe079ee3
+fe9ff06f
+~~~
+
+### Parpadeo sin retardo (para ejecutar en simulador)
+
+Código C
+
+~~~C
+#include <stdint.h>
+int main(void)
+{
+    volatile uint32_t *const o0 = (void*)0x80000010;
+    for(;;)
+    {
+        *o0 = ! *o0;
+    }
+}
+~~~
+
+Listado Ensamblador
+
+~~~asm
+00000000 <main>:
+    0:         80000737        lui x14 0x80000
+00000004 <L2>:
+    4:         01072783        lw x15 16 x14
+    8:         0017b793        sltiu x15 x15 1
+    c:         00f72823        sw x15 16 x14
+    10:        ff5ff06f        jal x0 -12 <L2>
+~~~
+
+Archivo parpadeo_sin_retardo.mem:
+
+~~~hex
+80000737
+01072783
+0017b793
+00f72823
+ff5ff06f
+~~~
