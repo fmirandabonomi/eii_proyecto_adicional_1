@@ -19,7 +19,8 @@ arch_producidos = $(wildcard $(resultados)/*.*) $(wildcard $(trabajo)/*.*)
 .PHONY: all clean $(blancos)
 
 help:
-	@echo -e "Uso:\n"\
+	@echo -e "Uso:\n\n"\
+  "   make nuevo_<entidad> : crea desde plantilla la entidad <entidad> en el archivo src/<entidad>.vhd y una simulación para la misma en src/sim_<entidad>.vhd\n"\
 	"    make <entidad> : ejecuta la simulación definida en sim_<entidad>.vhd\n"\
 	"    make clean : borra todos los archivos generados\n"\
 	"    make diagrama..<entidad> : genera un diagrama para la entidad <entidad> [requiere netlistsvg]\n"\
