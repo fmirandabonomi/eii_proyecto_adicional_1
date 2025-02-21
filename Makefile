@@ -1,3 +1,6 @@
+as ?= riscv64-unknown-elf-as
+objcopy ?= riscv64-unknown-elf-objcopy
+
 prefijo        ?= sim
 dir_fuentes    ?= src
 dir_resultados ?= resultados
@@ -12,6 +15,8 @@ ops 	   := --std=08
 
 blancos := $(patsubst $(prefijo)_%,%,$(sims))
 
+blancos_asm := $(basename $(notdir $(wildcard $(fuentes)/*.s)))
+
 arch_fuente = $(wildcard $(fuentes)/*.vhd)
 
 arch_producidos = $(wildcard $(resultados)/*.*) $(wildcard $(trabajo)/*.*)
@@ -20,14 +25,18 @@ arch_producidos = $(wildcard $(resultados)/*.*) $(wildcard $(trabajo)/*.*)
 
 help:
 	@echo -e "Uso:\n\n"\
-  "   make nuevo_<entidad> : crea desde plantilla la entidad <entidad> en el archivo src/<entidad>.vhd y una simulación para la misma en src/sim_<entidad>.vhd\n"\
+	"    make asm : ensambla todos los archivos .s en src, generando archivos .mem en resultados (usados para inicializar memorias)\n"\
+	"    make all : ensambla todos los archivos .s y corre todas las simulaciones\n"\
+	"    make nuevo_<entidad> : crea desde plantilla la entidad <entidad> en el archivo src/<entidad>.vhd y una simulación para la misma en src/sim_<entidad>.vhd\n"\
 	"    make <entidad> : ejecuta la simulación definida en sim_<entidad>.vhd\n"\
 	"    make clean : borra todos los archivos generados\n"\
 	"    make diagrama..<entidad> : genera un diagrama para la entidad <entidad> [requiere netlistsvg]\n"\
 	"    make sintesis..<entidad> : realiza la síntesis lógica para FPGA hx4k de la entidad <entidad>. Requiere el archivo de especificación de pines <entidad>.pcf\n"\
 	"    make carga..<entidad> : carga en la FPGA hx4k el bitmap generado por make sintesis..<entidad>.\n\n"
 
-all : $(blancos)
+all : $(blancos_asm) $(blancos)
+
+asm : $(blancos_asm)
 
 ifeq ($(arch_producidos),)
 clean :
@@ -73,6 +82,21 @@ carga..$(1): $(dir_resultados)/$(1).bin
 endef
 
 $(foreach blanco,$(blancos),$(eval $(call plantilla,$(blanco),$(prefijo)_$(blanco))))
+
+define plantilla_asm =
+$(1): $(dir_resultados)/$(1).mem
+
+$(dir_trabajo)/$(1).o : $(dir_fuentes)/$(1).s
+	$(as) -march=rv32i $(dir_fuentes)/$(1).s -o $(dir_trabajo)/$(1).o
+
+$(dir_trabajo)/$(1).bin : $(dir_trabajo)/$(1).o
+	$(objcopy) -O binary $(dir_trabajo)/$(1).o $(dir_trabajo)/$(1).bin
+
+$(dir_resultados)/$(1).mem : $(dir_trabajo)/$(1).bin | $(resultados)
+	hexdump -e '/4 "%08x\n"' $(dir_trabajo)/$(1).bin >$(dir_resultados)/$(1).mem
+endef
+
+$(foreach blanco,$(blancos_asm),$(eval $(call plantilla_asm,$(blanco))))
 
 define plantilla_nuevo_sim =
 library IEEE;
